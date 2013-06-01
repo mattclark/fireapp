@@ -6,6 +6,11 @@ if (mysqli_connect_errno())
   echo "Failed to connect to MySQL: " . mysqli_connect_error();
   }
 
+if(isset($_GET["pre"])) {
+  $state = $_GET["state"];
+  $zip = $_GET["zip"];
+}
+
 if(isset($_POST["submitted"])) {
 
   $state = $_POST["state"];
@@ -24,12 +29,19 @@ if(isset($_POST["submitted"])) {
 
     <!-- Le styles -->
     <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/bootstrap-responsive.css" rel="stylesheet">
     <style>
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
       }
+      .navbar-inner {
+        background: url('img/home_bg.jpg') top center repeat !important; color: #F0F0F0 !important;
+      }
+      .navbar-inner a { color: #FFF !important; }
+      .navbar-inverse .nav .active > a, .navbar-inverse .nav .active > a:hover, .navbar-inverse .nav .active > a:focus, .navbar-inner .nav a:hover {
+        background: url('img/header_hover.png') top center repeat !important;
+      }
     </style>
-    <link href="css/bootstrap-responsive.css" rel="stylesheet">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -57,7 +69,9 @@ if(isset($_POST["submitted"])) {
           <a class="brand" href="#">FireApp</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Search</a></li>
+              <li class="active"><a href="index.php">Browse</a></li>
+              <li><a href="tips.php">Fire Prevention Tips</a></li>
+              <li><a href="report.php">Report a Fire</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -67,78 +81,64 @@ if(isset($_POST["submitted"])) {
     <div class="container">
 
       <form class="form-horizontal" action="index.php" method="POST">
-        <div class="control-group">
-          <label class="control-label" for="inputEmail">Select State</label>
-          <div class="controls">
-            <select name="state" id="state" onchange="this.form.submit()">
-              <option value="" selected="selected">All</option> 
-              <?php
-                $query = "SELECT DISTINCT state FROM fires_table ORDER BY state ASC";
 
-                 $result = mysqli_query($con,$query);
+      <div class="row-fluid">
+        <div class="span5">
+          <div class="control-group">
+            <label class="control-label" for="inputEmail">Select State</label>
+            <div class="controls">
+              <select name="state" id="state" onchange="this.form.submit()">
+                <option value="" selected="selected">All</option> 
+                <?php
+                  $query = "SELECT DISTINCT state FROM fires_table ORDER BY state ASC";
 
-                while($row = mysqli_fetch_array($result))
-                  { ?>
-                  <option value="<?php echo $row['state']; ?>"
-                  <?php if($state == $row['state']) { echo " SELECTED"; } ?>
-                  ><?php echo $row['state']; ?></option>
-                  <?php } 
-              ?>
-            </select>
+                   $result = mysqli_query($con,$query);
+
+                  while($row = mysqli_fetch_array($result))
+                    { ?>
+                    <option value="<?php echo $row['state']; ?>"
+                    <?php if($state == $row['state']) { echo " SELECTED"; } ?>
+                    ><?php echo $row['state']; ?></option>
+                    <?php } 
+                ?>
+              </select>
+            </div>
           </div>
         </div>
-        <?php if(isset($state)) { ?>
-        <div class="control-group">
-          <label class="control-label" for="inputPassword">Select Zip Code</label>
-          <div class="controls">
-            <select id="zipcode" name="zipcode[]" multiple>
-              <option value="" selected="selected">All</option>
-              <?php
-                $query = "SELECT DISTINCT zip FROM fires_table WHERE state = '" . $state . "' ORDER BY zip ASC";
+        <div class="span3">
+          <?php if(isset($state)) { ?>
+          <div class="control-group">
+            <label class="control-label" for="inputPassword">Select Zip Code(s)</label>
+            <div class="controls">
+              <select id="zipcode" name="zipcode[]" multiple>
+                <option value="" selected="selected">All</option>
+                <?php
+                  $query = "SELECT DISTINCT zip FROM fires_table WHERE state = '" . $state . "' ORDER BY zip ASC";
 
-                 $result = mysqli_query($con,$query);
+                   $result = mysqli_query($con,$query);
 
-                while($row = mysqli_fetch_array($result))
-                  { ?>
-                  <option value="<?php echo $row['zip']; ?>"
-                  <?php if($zip == $row['zip']) { } ?>
-                  ><?php echo $row['zip']; ?></option>
-                  <?php } 
-              ?>
-            </select>
+                  while($row = mysqli_fetch_array($result))
+                    { ?>
+                    <option value="<?php echo $row['zip']; ?>"
+                    <?php if($zip == $row['zip']) { } ?>
+                    ><?php echo $row['zip']; ?></option>
+                    <?php } 
+                ?>
+              </select>
+            </div>
+          </div>
+          <?php } ?>
+        </div>
+        <div class="span3" id="submit_cell">
+          <div class="control-group">
+            <div class="controls">
+              <input type="hidden" name="submitted" value="true" />
+              <?php if(isset($_POST["submitted"]) || isset($_GET["pre"])) { ?><button type="submit" class="btn">Search</button><?php } ?>
+            </div>
           </div>
         </div>
-        <?php } ?>
-        <!--<div class="control-group">
-          <label class="control-label" for="inputPassword">Type of Fire</label>
-          <div class="controls">
-            <select id="firetype" name="firetype">
-              <option value="" selected="selected">All</option>
-              <option>Residential Structure</option>
-              <option>Non-Residential Structure</option>
-              <option>Vehicle</option>
-              <option>Outside</option>
-              <option>Other</option>
-            </select>
-          </div>
-        </div>
-        <div class="control-group">
-          <label class="control-label" for="inputPassword">Cause of Fire</label>
-          <div class="controls">
-            <select id="firecause" name="firecause">
-          <option value="" selected="selected">All</option>
-          <option>Smoking</option>
-          <option>Heating</option>
-          <option>Cooking</option>
-        </select>
-          </div>
-        </div>-->
-        <div class="control-group">
-          <div class="controls">
-            <input type="hidden" name="submitted" value="true" />
-            <?php if(isset($_POST["submitted"])) { ?><button type="submit" class="btn">Search</button><?php } ?>
-          </div>
-        </div>
+      </div>
+
       </form>
 
       <?php
@@ -147,30 +147,41 @@ if(isset($_POST["submitted"])) {
 
       ?>
       <ul class="nav nav-tabs" id="myTab">
-        <li class="active"><a href="#data" data-toggle="tab">Data</a></li>
-        <li><a href="#graphs" data-toggle="tab">Graphs</a></li>
+        <li class="active"><a href="#summary" data-toggle="tab">Summary</a></li>
+        <li><a href="#graphs" data-toggle="tab">Heatmap</a></li>
+        <li><a href="#data" data-toggle="tab">Data</a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="data">
+        <div class="tab-pane active" id="summary">
+          ...
+        </div>
+        <div class="tab-pane" id="data">
           <table class="table table-striped">
             <thead>
                 <tr>
-                  <th>State</th>
                   <th>Zip Code</th>
                   <th>Total Fires</th>
-                  <th></th>
-                  <th></th>
-                  <th></th>
+                  <th>% Major</th>
+                  <th>Intentional</th>
+                  <th>Smoking</th>
+                  <th>Heating</th>
+                  <th>Cooking</th>
                 </tr>
               </thead>
               <tbody>
 
       <?php
 
-      $zip_arr = implode(',', $zip);
+      if(isset($_GET["pre"])) {
 
-      $query = "SELECT * FROM fires_table WHERE state LIKE '%" . $state . "%' AND zip IN (" . $zip_arr . ")";
+        $query = "SELECT * FROM fires_table WHERE state LIKE '%" . $state . "%' AND zip = (" . $zip . ")";
+
+      } else {
+        $zip_arr = implode(',', $zip);
+        $query = "SELECT * FROM fires_table WHERE state LIKE '%" . $state . "%' AND zip IN (" . $zip_arr . ")";
+
+      }
 
       //var_dump($_POST);
 
@@ -181,11 +192,13 @@ if(isset($_POST["submitted"])) {
       while($row = mysqli_fetch_array($result))
         {
         echo "<tr>";
-        echo "<td>" . $row['state'] . "</td>";
-        echo "<td>" . $row['zip'] . "</td>";
+        echo "<td><a href='index.php?pre=true&state=" . $state . "&zip=" . $row['zip'] . "'>" . $row['zip'] . "</a></td>";
         echo "<td>" . $row['fires'] . "</td>";
-        echo "<td></td>";
-        echo "<td></td>";
+        echo "<td>" . round($row['major_pct'],2) . "%</td>";
+        echo "<td>" . round($row['cause_int_pct'],2) . "%</td>";
+        echo "<td>" . round($row['cause_smoking_pct'],2) . "%</td>";
+        echo "<td>" . round($row['cause_heating_pct'],2) . "%</td>";
+        echo "<td>" . round($row['cause_cooking_pct'],2) . "%</td>";
         echo "</tr>";
         } 
 
@@ -195,7 +208,11 @@ if(isset($_POST["submitted"])) {
       </table>
 
     </div>
-        <div class="tab-pane" id="graphs"></div>
+        <div class="tab-pane" id="graphs">
+          <?php if(isset($zip)) { ?>
+          <iframe src="heatmap/demo/maps_heatmap_layer/gmaps.html" frameborder="0" width="100%" scrolling="no" height="400"></iframe>
+          <?php } ?>
+        </div>
     </div>
 
     </div> <!-- /container -->
