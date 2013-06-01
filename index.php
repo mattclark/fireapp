@@ -153,6 +153,18 @@ if(isset($_POST["submitted"])) {
 
       <div class="tab-content">
         <div class="tab-pane active" id="data">
+          <table class="table table-striped">
+            <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Zip Code</th>
+                  <th>Total Fires</th>
+                  <th></th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
 
       <?php
 
@@ -168,13 +180,19 @@ if(isset($_POST["submitted"])) {
 
       while($row = mysqli_fetch_array($result))
         {
-        echo $row['state'] . " - " . $row['zip'] . " - " . $row['fires'];
-        echo "<br>";
+        echo "<tr>";
+        echo "<td>" . $row['state'] . "</td>";
+        echo "<td>" . $row['zip'] . "</td>";
+        echo "<td>" . $row['fires'] . "</td>";
+        echo "<td></td>";
+        echo "<td></td>";
+        echo "</tr>";
         } 
 
       }
 
-    ?>
+    ?>  </tbody>
+      </table>
 
     </div>
         <div class="tab-pane" id="graphs"></div>
